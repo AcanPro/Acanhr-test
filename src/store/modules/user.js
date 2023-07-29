@@ -32,6 +32,11 @@ const actions = {
 		const res = await getUserInfo()
 		console.log(res)
 		context.commit('setUserInfo', res.data.data)
+	},
+	loginOutAction(context) {
+		// 清除vuex的数据
+		context.commit('removeToken')
+		context.commit('setUserInfo', {})
 	}
 }
 

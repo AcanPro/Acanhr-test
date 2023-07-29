@@ -2,6 +2,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import router from '@/router'
 
 // create an axios instance
 const service = axios.create({
@@ -30,7 +31,13 @@ service.interceptors.response.use((response) => {
 		Message.error(message)
 		return Promise.reject(new Error(message))
 	}
-}, (err) => {
+}, async (err) => {
+
+	if (err.response.status === 401) {
+		await store.dispatch('user/loginOutAction')
+		router.push('/login')
+	}
+	// 
 	Message.error(err.message)
 	return Promise.reject(err)
 }
