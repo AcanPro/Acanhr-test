@@ -35,8 +35,8 @@ export default {
 	data() {
 		return {
 			loginForm: {
-				mobile: '13800000002',
-				password: 'hm#qd@23!',
+				mobile: process.env.NODE_ENV === 'development' ? '13800000002' : '',
+				password: process.env.NODE_ENV === 'development' ? 'hm#qd@23!' : '',
 				isAgree: false
 			},
 			loginRules: {
@@ -58,10 +58,11 @@ export default {
 			value ? callback() : callback(new Error('你必须勾选用户协议'))
 		},
 		login() {
-			this.$refs.form.validate((valid) => {
+			this.$refs.form.validate(async (valid) => {
 				if (valid) {
 					// alert('通过')
-					this.$store.dispatch('user/loginAction', this.loginForm)
+					await this.$store.dispatch('user/loginAction', this.loginForm)
+					this.$router.push('/')
 				}
 			})
 		}

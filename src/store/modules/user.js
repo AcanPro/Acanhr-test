@@ -18,6 +18,7 @@ const mutations = {
 
 
 const actions = {
+	// 使用actions返回的是一个promise，需要解析
 	async loginAction(context, data) {
 		const res = await login(data)
 		console.log(res)
