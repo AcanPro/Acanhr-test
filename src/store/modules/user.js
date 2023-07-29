@@ -23,7 +23,8 @@ const actions = {
 		const res = await login(data)
 		console.log(res)
 		context.commit('setToken', res.data.data)
-	}
+	},
+
 }
 
 export default {
