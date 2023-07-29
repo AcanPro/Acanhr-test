@@ -35,8 +35,8 @@ export default {
 	data() {
 		return {
 			loginForm: {
-				mobile: '',
-				password: '',
+				mobile: '13800000002',
+				password: 'hm#qd@23!',
 				isAgree: false
 			},
 			loginRules: {
@@ -60,7 +60,8 @@ export default {
 		login() {
 			this.$refs.form.validate((valid) => {
 				if (valid) {
-					alert('通过')
+					// alert('通过')
+					this.$store.dispatch('user/loginAction', this.loginForm)
 				}
 			})
 		}
