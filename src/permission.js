@@ -7,7 +7,7 @@ const whiteList = ['/login', '/404']
 /**
  * 前置守卫
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 	nProgress.start()
 	if (store.getters.token) {
 		// 存在token
@@ -17,6 +17,10 @@ router.beforeEach((to, from, next) => {
 			// next（地址）并没有执行后置守卫
 			nProgress.done()
 		} else {
+			if (!store.getters.userId) {
+				// action返回的值是promise，需要等待数据请求完成才执行下面跳转代码
+				await store.dispatch('user/getUserInfoAction')
+			}
 			next() // 放行
 		}
 	} else {
