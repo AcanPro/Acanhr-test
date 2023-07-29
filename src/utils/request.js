@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+
 import router from '@/router'
 
 // create an axios instance
@@ -24,7 +24,7 @@ service.interceptors.request.use((config) => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
-	const { data, message, success } = response.data
+	const { message, success } = response.data
 	if (success) {
 		return response
 	} else {
@@ -33,7 +33,7 @@ service.interceptors.response.use((response) => {
 	}
 }, async (err) => {
 
-	if (err.response.status === 401) {
+	if (err.response?.status === 401) {
 		await store.dispatch('user/loginOutAction')
 		router.push('/login')
 	}
