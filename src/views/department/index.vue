@@ -9,7 +9,8 @@
             <el-col>{{ props.data.name }}</el-col>
             <el-col :span="4">
               <span class="tree-manager">{{ props.data.managerName }}</span>
-              <el-dropdown @command="operateDept">
+              <!-- 每一个默认参数都有 $event ，加上第二个参数id -->
+              <el-dropdown @command="operateDept($event,props.data.id)">
                 <span class="el-dropdown-link">
                   操作<i class="el-icon-arrow-down el-icon--right" />
                 </span>
@@ -25,7 +26,7 @@
       </el-tree>
     </div>
     <!-- .sync 就是接受子组件的update：变量  ，这里showDialog就会 更新 接收传出来的值  -->
-    <add-dept :show-dialog.sync="showDialog" />
+    <add-dept :current-id="currentId" :show-dialog.sync="showDialog" @updateList="getDepartment" />
   </div>
 </template>
 <script>
@@ -40,10 +41,9 @@ export default {
   },
   data() {
     return {
+      currentId: null,
       showDialog: false,
-      depts: [
-
-      ],
+      depts: [],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -59,10 +59,11 @@ export default {
       console.log(res.data.data)
       this.depts = transListToTreeData(res.data.data, 0)
     },
-    operateDept(command) {
+    operateDept(command, id) {
       if (command === 'add') {
         // 跳出弹窗
         this.showDialog = true
+        this.currentId = id
       }
     }
   }
