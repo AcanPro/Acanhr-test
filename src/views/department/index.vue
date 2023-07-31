@@ -24,7 +24,7 @@
         </template>
       </el-tree>
     </div>
-    <!-- .sync 就是接受子组件的update：变量  ，这里showDialog就会接收传出来的值  -->
+    <!-- .sync 就是接受子组件的update：变量  ，这里showDialog就会 更新 接收传出来的值  -->
     <add-dept :show-dialog.sync="showDialog" />
   </div>
 </template>
