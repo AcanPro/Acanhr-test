@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增部门" :visible="showDialog" @close="close">
+  <el-dialog :title="updateTitle" :visible="showDialog" @close="close">
     <el-form ref="addDept" label-width="120px" :model="formData" :rules="rules">
       <el-form-item prop="name" label="部门名称">
         <el-input v-model="formData.name" placeholder="2-10个字符" style="width: 80%;" size="mini" />
@@ -36,7 +36,13 @@
 </template>
 
 <script >
-import { getDepartment, getManagerList, addDepartment } from '@/api/department'
+import {
+        getDepartment,
+        getManagerList,
+        addDepartment,
+        getDepartmentDetails,
+        updateDepartment
+       } from '@/api/department'
 
 export default {
   props: {
@@ -80,17 +86,32 @@ export default {
       }
     }
   },
+  computed: {
+    updateTitle() {
+      return this.formData.id ? '编辑部门' : '新增部门'
+    }
+  },
   created() {
     this.getManagerList()
   },
   methods: {
     close() {
+      this.formData = {
+        code: '', // 部门编码
+        introduce: '', // 部门介绍
+        managerId: '', // 部门负责人名字
+        name: '', // 部门名称
+        pid: '' // 部门父级部门id
+      }
       this.$emit('update:showDialog', false)
       this.$refs.addDept.resetFields()
     },
     async confirmCode(rule, value, callback) {
       const res = await getDepartment()
-      const data = res.data.data
+      let data = res.data.data
+      if (this.formData.id) {
+        data = data.filter(item => item.id !== this.formData.id)
+      }
       if (data.some(item => item.code === value)) {
         callback(new Error('该部门编码已存在'))
       } else {
@@ -99,7 +120,10 @@ export default {
     },
     async confirmName(rule, value, callback) {
       const res = await getDepartment()
-      const data = res.data.data
+      let data = res.data.data
+      if (this.formData.id) {
+        data = data.filter(item => item.id !== this.formData.id)
+      }
       if (data.some(item => item.name === value)) {
         callback(new Error('该部门名称已存在'))
       } else {
@@ -113,18 +137,30 @@ export default {
     btnOk() {
       this.$refs.addDept.validate(async valid => {
         if (valid) {
+          let msg = '添加'
+          if (this.formData.id) {
+            // 编辑
+            msg = '更新'
+            await updateDepartment(this.formData)
+          } else {
+          // 添加
           // pid为空 所以展开之后，在后面给pid赋值，
           // this.formData.pid = this.currentId
-          await addDepartment({
-            ...this.formData,
-            pid: this.currentId
-          })
+            await addDepartment({
+              ...this.formData,
+              pid: this.currentId
+            })
+          }
           // 通知父组件更新
           this.$emit('updateList')
-          this.$message.success('添加成功')
+          this.$message.success(`${msg}成功`)
           this.close()
         }
       })
+    },
+    async getDepartmentDetails() {
+      const res = await getDepartmentDetails(this.currentId)
+      this.formData = res.data.data
     }
   }
 }

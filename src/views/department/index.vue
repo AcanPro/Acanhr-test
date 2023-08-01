@@ -26,11 +26,11 @@
       </el-tree>
     </div>
     <!-- .sync 就是接受子组件的update：变量  ，这里showDialog就会 更新 接收传出来的值  -->
-    <add-dept :current-id="currentId" :show-dialog.sync="showDialog" @updateList="getDepartment" />
+    <add-dept ref="addDept" :current-id="currentId" :show-dialog.sync="showDialog" @updateList="getDepartment" />
   </div>
 </template>
 <script>
-import { getDepartment } from '@/api/department'
+import { getDepartment, deleteDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils/index'
 import AddDept from '@/views/department/components/AddDept.vue'
 
@@ -59,11 +59,32 @@ export default {
       console.log(res.data.data)
       this.depts = transListToTreeData(res.data.data, 0)
     },
-    operateDept(command, id) {
+     operateDept(command, id) {
       if (command === 'add') {
         // 跳出弹窗
         this.showDialog = true
         this.currentId = id
+      } else if (command === 'edit') {
+        this.showDialog = true
+        this.currentId = id
+        // 调用子组件方法请求数据
+
+        // nextTick 作用是 等上面代码执行完成之后在执行下面代码
+        // 因为 是同步， this.currentId = id 还没赋值完成就会执行这个代码，所以拿不到id
+        // 传id过去是异步的，所以需要加这个
+        this.$nextTick(() => {
+          this.$refs.addDept.getDepartmentDetails()
+        })
+      } else if (command === 'del') {
+        this.$confirm('是否确认删除该部门', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async() => {
+          await deleteDepartment(id)
+          this.$message.success('删除成功')
+          this.getDepartment()
+        })
       }
     }
   }

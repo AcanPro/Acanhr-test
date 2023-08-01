@@ -26,3 +26,24 @@ export function addDepartment(data) {
   })
 }
 
+export function getDepartmentDetails(id) {
+  return request({
+    url: `/company/department/${id}`,
+    method: 'get'
+  })
+}
+
+export function updateDepartment(data) {
+  return request({
+    url: `/company/department/${data.id}`,
+    method: 'put',
+    data
+  })
+}
+export function deleteDepartment(id) {
+  return request({
+    url: `/company/department/${id}`,
+    method: 'delete'
+  })
+}
+
