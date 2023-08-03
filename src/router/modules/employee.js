@@ -10,5 +10,14 @@ export default {
       title: '员工',
       icon: 'people'
     }
-  }]
+  }, {
+    // 动态路由
+    path: '/employee/detail/:id?',
+    component: () => import('@/views/employee/detail.vue'),
+    hidden: true,
+    meta: {
+      title: '员工详情'
+    }
+  }
+]
 }

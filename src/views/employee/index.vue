@@ -25,7 +25,7 @@
       </div>
       <div class="right">
         <el-row class="opeate-tools" type="flex" justify="end">
-          <el-button size="mini" type="primary">添加员工</el-button>
+          <el-button size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
           <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
           <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
@@ -50,10 +50,12 @@
           <el-table-column prop="departmentName" label="部门" />
           <el-table-column prop="timeOfEntry" label="入职时间" sortable />
           <el-table-column label="操作" width="280px">
-            <template>
-              <el-button size="mini" type="text">查看</el-button>
+            <template v-slot="{row}">
+              <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
               <el-button size="mini" type="text">角色</el-button>
-              <el-button size="mini" type="text">删除</el-button>
+              <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="confirmDel(row.id)">
+                <el-button slot="reference" size="mini" type="text" class="del">删除</el-button>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -75,7 +77,7 @@
 
 <script>
 import { getDepartment } from '@/api/department'
-import { getEmployeeList, exportEmployee } from '@/api/employee'
+import { getEmployeeList, exportEmployee, deleteEmployee } from '@/api/employee'
 import { transListToTreeData } from '@/utils'
 import FileSaver from 'file-saver'
 import ImportExcel from './components/ImportExcel'
@@ -149,6 +151,13 @@ export default {
       // console.log(result) // 使用一个npm包 直接将blob文件下载到本地 file-saver
       // FileSaver.saveAs(blob对象,文件名称)
      FileSaver.saveAs(res.data, '员工信息表.xlsx')
+    },
+    async confirmDel(id) {
+      await deleteEmployee(id)
+      // 删除过后页码如果大于一，列表长度为空，就减一，再次刷新数据
+      if (this.list.length === 1 && this.queryParams.page > 1) this.queryParams.page--
+      this.getEmployeeList()
+      this.$message.success('删除成功')
     }
    }
 

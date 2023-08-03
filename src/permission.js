@@ -1,13 +1,13 @@
-import router from "./router";
-import nProgress from "nprogress";
+import router from './router'
+import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import store from "./store";
+import store from './store'
 
 const whiteList = ['/login', '/404']
 /**
  * 前置守卫
  */
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async(to, from, next) => {
 	nProgress.start()
 	if (store.getters.token) {
 		// 存在token
