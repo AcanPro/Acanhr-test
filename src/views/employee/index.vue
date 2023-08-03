@@ -26,8 +26,8 @@
       <div class="right">
         <el-row class="opeate-tools" type="flex" justify="end">
           <el-button size="mini" type="primary">添加员工</el-button>
-          <el-button size="mini">excel导入</el-button>
-          <el-button size="mini">excel导出</el-button>
+          <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
+          <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
         <!-- 表格组件 -->
         <el-table :data="list">
@@ -69,16 +69,22 @@
         </el-row>
       </div>
     </div>
+    <import-excel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getEmployeeList" />
   </div>
 </template>
 
 <script>
 import { getDepartment } from '@/api/department'
-import { getEmployeeList } from '@/api/employee'
+import { getEmployeeList, exportEmployee } from '@/api/employee'
 import { transListToTreeData } from '@/utils'
+import FileSaver from 'file-saver'
+import ImportExcel from './components/ImportExcel'
 
 export default {
   name: 'Employee',
+  components: {
+    ImportExcel
+  },
    data() {
     return {
       depts: [], // 组织数据
@@ -94,7 +100,8 @@ export default {
         keyword: ''
       },
       total: 0,
-      list: []
+      list: [],
+      showExcelDialog: false
     }
    },
    created() {
@@ -136,6 +143,12 @@ export default {
         // 后端返回搜索结果
         this.getEmployeeList()
       }, 500)
+    },
+    async exportEmployee() {
+     const res = await exportEmployee()
+      // console.log(result) // 使用一个npm包 直接将blob文件下载到本地 file-saver
+      // FileSaver.saveAs(blob对象,文件名称)
+     FileSaver.saveAs(res.data, '员工信息表.xlsx')
     }
    }
 

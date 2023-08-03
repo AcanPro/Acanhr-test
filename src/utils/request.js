@@ -24,7 +24,12 @@ service.interceptors.request.use((config) => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
+  // 判断接受二进制流
+  if (response.data instanceof Blob) return response
+
   const { message, success } = response.data
+
+  // json
   if (success) {
     return response
   } else {
