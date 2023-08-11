@@ -35,7 +35,7 @@
               <el-button size="mini" @click="row.isEdit = false">取消</el-button>
             </template>
             <template v-else>
-              <el-button size="mini" type="text">分配权限</el-button>
+              <el-button size="mini" type="text" @click="btnPermission(row.id)">分配权限</el-button>
               <el-button size="mini" type="text" @click="btnEditRow(row)">编辑</el-button>
               <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="confirmDel(row.id)">
                 <el-button slot="reference" size="mini" type="text" class="del">删除</el-button>
@@ -79,10 +79,31 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 放置权限弹层 -->
+    <el-dialog :visible.sync="showPermissionDialog" title="分配权限">
+      <!-- 放置权限数据 -->
+      <el-tree
+        ref="permTree"
+        node-key="id"
+        :data="permissionData"
+        :props="{ label: 'name' }"
+        show-checkbox
+        default-expand-all
+        :default-checked-keys="permIds"
+      />
+      <el-row slot="footer" type="flex" justify="center">
+        <el-col :span="6">
+          <el-button type="primary" size="mini" @click="btnPermissionOK">确定</el-button>
+          <el-button size="mini" @click="showPermissionDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getRoleList, addRole, updateRole, delRole } from '@/api/role'
+import { getPermissionList } from '@/api/permission'
+import { getRoleList, addRole, updateRole, delRole, getRoleDetail, assignPerm } from '@/api/role'
+import { transListToTreeData } from '@/utils'
 
 export default {
   name: 'Role',
@@ -103,7 +124,11 @@ export default {
       rules: {
         name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }],
         description: [{ required: true, message: '角色描述不能为空', trigger: 'blur' }]
-      }
+      },
+      showPermissionDialog: false,
+      permissionData: [],
+      currentRoleId: null,
+      permIds: []
     }
   },
   created() {
@@ -177,6 +202,23 @@ export default {
       // 删除的如果是最后一个
       if (this.list.length === 1) this.pageParams.page--
       this.getRoleList()
+    },
+    async  btnPermission(id) {
+      this.currentRoleId = id
+      const res = await getPermissionList()
+      this.permissionData = transListToTreeData(res.data.data, 0)
+      const resd = await getRoleDetail(id)
+      const { permIds } = resd.data.data
+      this.permIds = permIds
+      this.showPermissionDialog = true
+    },
+    async  btnPermissionOK() {
+      await assignPerm({
+        id: this.currentRoleId,
+        permIds: this.$refs.permTree.getCheckedKeys()
+      })
+      this.$message.success('角色分配权限成功')
+      this.showPermissionDialog = false
     }
 
   }

@@ -62,3 +62,17 @@ export function updateEmployee(data) {
   })
 }
 
+export function getEnableRoleList() {
+  return request({
+    url: '/sys/role/list/enabled'
+  })
+}
+
+export function assignRole(data) {
+  return request({
+    url: '/sys/user/assignRoles',
+    method: 'put',
+    data
+  })
+}
+

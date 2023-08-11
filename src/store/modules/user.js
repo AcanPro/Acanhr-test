@@ -1,9 +1,12 @@
 import { login, getUserInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { constantRoutes } from '@/router'
+import { resetRouter } from '@/router'
 
 const state = {
   token: getToken() || '',
-  userInfo: {}
+  userInfo: {},
+  routes: []
 }
 
 const mutations = {
@@ -17,6 +20,9 @@ const mutations = {
   },
   setUserInfo(state, newInfo) {
     state.userInfo = newInfo
+  },
+  setRoutes(state, newRoutes) {
+    state.routes = [...constantRoutes, ...newRoutes]
   }
 }
 
@@ -31,11 +37,13 @@ const actions = {
     const res = await getUserInfo()
     console.log(res)
     context.commit('setUserInfo', res.data.data)
+    return res.data.data
   },
   loginOutAction(context) {
     // 清除vuex的数据
     context.commit('removeToken')
     context.commit('setUserInfo', {})
+    resetRouter()
   }
 }
 
