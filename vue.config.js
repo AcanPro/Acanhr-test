@@ -40,7 +40,7 @@ module.exports = {
 			'/api': {
 				target: 'https://heimahr.itheima.net/'
 			}
-		},
+		}
 		// before: require('./mock/mock-server.js')
 	},
 	configureWebpack: {
@@ -51,7 +51,13 @@ module.exports = {
 			alias: {
 				'@': resolve('src')
 			}
-		}
+		},
+          // 配置排出的包，使用cdn加速
+    externals: {
+      'vue': 'Vue',
+      'element-ui': 'ELEMENT',
+      'cos-js-sdk-v5': 'COS'
+    }
 	},
 	chainWebpack(config) {
 		// it can improve the speed of the first screen, it is recommended to turn on preload
